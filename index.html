@@ -55,6 +55,13 @@ a{color:inherit; text-decoration:none}
   .cancer-sec{order:2}
   .maincol{order:3}
 }
+
+.ctrl-groups{display:flex; flex-direction:column; gap:0}
+@media (min-width:900px){
+  .layout{grid-template-columns:1fr; grid-template-areas:"ctrl" "cancer" "main"}
+  .ctrl-groups{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px; align-items:start}
+  .ctrl-groups .cg{min-width:0}
+}
 .card{
   background:var(--paper); border:1px solid #142a371f;
   border-radius:var(--radius); box-shadow:var(--shadow); padding:14px;
@@ -88,9 +95,9 @@ input:focus{border-color:var(--blue); box-shadow:0 0 0 3px #05679a1c}
 }
 .age-line .err{color:var(--red)}
 .hint{font-size:14px; color:var(--muted); margin:6px 0 0; font-weight:600}
-.amt-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px}
+.amt-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:8px}
 .amt-grid button{
-  min-height:52px; padding:6px 4px; border:1.5px solid var(--line); background:#fff;
+  min-height:52px; padding:6px 2px; border:1.5px solid var(--line); background:#fff;
   border-radius:8px; font-weight:800; font-size:14px; color:var(--ink); line-height:1.25;
   white-space:nowrap;
 }
@@ -331,7 +338,8 @@ body.theme-clz{--cancer-accent:#1565c0}
   <div class="layout">
     <aside class="controls card" id="controls">
       <h2>投保條件</h2>
-      <label class="field client-name">客戶姓名
+      <div class="ctrl-groups">
+<div class="cg"><label class="field client-name">客戶姓名
         <input type="text" id="clientName" placeholder="輸入客戶姓名" autocomplete="name" maxlength="40">
       </label>
       <div class="seg" id="prodSeg">
@@ -340,7 +348,8 @@ body.theme-clz{--cancer-accent:#1565c0}
       </div>
       <p class="hint" id="prodHint">男性專屬｜豪愛無憂防癌定期健康保險（外溢保單）</p>
 
-      <div class="seg mode" id="ageModeSeg">
+      </div>
+<div class="cg"><div class="seg mode" id="ageModeSeg">
         <button type="button" class="active" data-mode="birth">輸入生日</button>
         <button type="button" data-mode="age">輸入歲數</button>
       </div>
@@ -359,7 +368,8 @@ body.theme-clz{--cancer-accent:#1565c0}
       <div class="age-line" id="ageLine"><span>請輸入生日或歲數</span></div>
       <p class="hint">10年期 18–60 歲；20年期 18–50 歲</p>
 
-      <label class="field">繳費年期
+      </div>
+<div class="cg"><label class="field">繳費年期
         <div class="seg term" id="termSeg">
           <button type="button" data-term="10">10年</button>
           <button type="button" data-term="20" class="active">20年</button>
@@ -380,7 +390,8 @@ body.theme-clz{--cancer-accent:#1565c0}
       </label>
       <p class="hint">最低 50 萬；累計本險種最高 300 萬</p>
 
-      <div class="premium-box" id="premiumBox">
+      </div>
+<div class="cg"><div class="premium-box" id="premiumBox">
         <div class="lab" id="premLab">年繳保費（依目前保額）</div>
         <div class="amt" id="premAnnual">—</div>
         <div class="sub" id="rateNote"></div>
@@ -390,6 +401,8 @@ body.theme-clz{--cancer-accent:#1565c0}
 
       <button type="button" class="btn" id="btnDownload">下載圖片</button>
       <p class="dl-hint" id="dlHint">下載＝保障圖＋單位試算表（桌面寬度）</p>
+    </div>
+</div>
     </aside>
 
     <section class="card cancer-sec" id="cancerSec" aria-label="保障癌症">
