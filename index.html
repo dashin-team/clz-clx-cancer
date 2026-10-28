@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f2a4a">
+<title>男癌／女癌試算｜CLZ・CLX（草稿）</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+<style>
+:root{
+  --ink:#142a37; --muted:#627680; --paper:#fffdf7; --cream:#f4efe3;
+  --blue:#05679a; --navy:#0f2a4a; --gold:#c9a45c; --red:#c83632; --line:#d6ddd9;
+  --accent:var(--blue); --accent-soft:#e8f3f9;
+  --radius:12px; --shadow:0 8px 22px #1f373e14;
+  --gap:12px; --max:1200px; --ctrl:320px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#e8ebe7}
+body{
+  margin:0; color:var(--ink); overflow-x:hidden;
+  background:radial-gradient(circle at 70% 10%,#f7f2e8 0,#e8ebe7 48%,#dce4e2 100%);
+  font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:16px; line-height:1.55;
+}
+img{max-width:100%; height:auto; display:block}
+button,input{font:inherit} button{cursor:pointer}
+a{color:inherit; text-decoration:none}
+
+.topbar{background:var(--navy); color:#fff; border-bottom:3px solid var(--gold); padding:10px 16px; box-shadow:0 8px 22px #0f2a4a2e}
+.brand{display:flex; align-items:center; max-width:var(--max); margin:0 auto; min-height:44px}
+.topbar h1{margin:0; font-size:22px; font-weight:800; letter-spacing:.04em; line-height:1.2}
+
+.app{max-width:var(--max); margin:0 auto; padding:10px 12px 28px}
+.quicknav{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 12px}
+.quicknav a{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:40px; padding:0 14px; border-radius:999px;
+  background:var(--paper); border:1px solid #142a371f; font-size:15px; font-weight:700;
+  box-shadow:var(--shadow);
+}
+.layout{display:grid; gap:var(--gap); grid-template-columns:1fr}
+.maincol,.controls,.card,.cancer-sec{min-width:0}
+@media (min-width:900px){
+  .layout{
+    grid-template-columns:minmax(260px,300px) minmax(0,1fr);
+    grid-template-areas:"ctrl cancer" "main main";
+    align-items:start;
+  }
+  .controls{grid-area:ctrl; position:static}
+  .cancer-sec{grid-area:cancer}
+  .maincol{grid-area:main}
+}
+@media (max-width:899px){
+  .cancer-sec{order:2}
+  .maincol{order:3}
+}
+.card{
+  background:var(--paper); border:1px solid #142a371f;
+  border-radius:var(--radius); box-shadow:var(--shadow); padding:14px;
+}
+.card h2{margin:0 0 12px; font-size:18px; font-weight:800; color:var(--navy); display:flex; align-items:center; gap:8px}
+.card h2 .tag{margin-left:auto; background:var(--accent-soft); color:var(--accent); font-size:14px; font-weight:800; padding:4px 10px; border-radius:999px}
+
+.seg{display:grid; grid-template-columns:1fr 1fr; gap:8px; background:var(--cream); padding:4px; border-radius:10px}
+.seg.term{grid-template-columns:repeat(2,1fr)}
+.seg.mode{margin-bottom:10px}
+.seg button{
+  border:0; background:transparent; min-height:44px; border-radius:8px;
+  font-weight:800; color:var(--muted); font-size:16px;
+}
+.seg button.active{background:var(--accent); color:#fff; box-shadow:0 2px 8px #0002}
+.seg button:disabled{opacity:.35; cursor:not-allowed}
+body.theme-clx .seg button.active{background:#c2185b}
+
+label.field{display:grid; gap:6px; font-size:17px; font-weight:800; color:#334b57; margin-top:12px}
+label.field.client-name{margin-top:0; margin-bottom:4px}
+input[type=text], input[type=number]{
+  width:100%; min-height:44px; padding:0 12px;
+  border:1px solid #b9c8c7; border-radius:0; background:#fff; color:var(--ink);
+  font-size:17px; font-weight:700; outline:none;
+}
+input:focus{border-color:var(--blue); box-shadow:0 0 0 3px #05679a1c}
+.age-line{
+  margin-top:8px; padding:10px 12px; background:var(--accent-soft);
+  border-radius:8px; font-size:16px; font-weight:700; color:var(--accent);
+  min-height:44px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;
+}
+.age-line .err{color:var(--red)}
+.hint{font-size:14px; color:var(--muted); margin:6px 0 0; font-weight:600}
+.amt-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px}
+.amt-grid button{
+  min-height:52px; padding:6px 4px; border:1.5px solid var(--line); background:#fff;
+  border-radius:8px; font-weight:800; font-size:14px; color:var(--ink); line-height:1.25;
+  white-space:nowrap;
+}
+.amt-grid button.active{border-color:var(--accent); background:var(--accent-soft); color:var(--accent)}
+body.theme-clx .amt-grid button.active{border-color:#c2185b; background:#fce4ec; color:#c2185b}
+.custom-amt{display:flex; gap:8px; margin-top:8px; align-items:center}
+.custom-amt input{flex:1}
+.custom-amt span{font-size:15px; font-weight:700; color:var(--muted)}
+.premium-box{
+  margin-top:12px; padding:12px; border-radius:10px; background:#fff8e6;
+  border:1px solid #f5d78e;
+}
+.premium-box .lab{font-size:14px; color:var(--muted); font-weight:700}
+.premium-box .amt{font-size:28px; font-weight:900; color:var(--red); margin-top:2px}
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; width:100%; border:0; border-radius:10px;
+  font-weight:800; font-size:17px; margin-top:14px;
+  background:var(--navy); color:#fff;
+}
+.btn:disabled{opacity:.5; cursor:wait}
+body.theme-clx .btn{background:#880e4f}
+.dl-hint{font-size:14px; color:var(--muted); margin:8px 0 0; text-align:center}
+
+/* Chart image + overlays */
+.maincol{display:flex; flex-direction:column; gap:12px; align-items:stretch}
+#chartAnchor{scroll-margin-top:12px; height:fit-content; min-height:0; align-self:start; width:100%}
+.chart-wrap{padding:0 !important; overflow:hidden; margin:0; height:fit-content; min-height:0; align-self:start; width:100%}
+.chart-stage{position:relative; width:100%; line-height:0; height:fit-content; min-height:0; container-type:inline-size; container-name:chart}
+.chart-stage > img.base{width:100%; height:auto; display:block; vertical-align:top}
+.client-banner{
+  display:none; margin:0; padding:0 18px; min-height:0;
+  border-radius:14px; font-size:18px; font-weight:900; color:#0d47a1;
+  line-height:1; letter-spacing:.02em;
+  align-items:center; justify-content:center; text-align:center;
+  background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 55%,#90caf9 100%);
+  box-shadow:0 4px 14px rgba(21,101,192,.18), inset 0 1px 0 rgba(255,255,255,.65);
+}
+.client-banner.show{display:flex; margin:0 0 12px; min-height:48px}
+body.theme-clx .client-banner{
+  color:#880e4f;
+  background:linear-gradient(135deg,#fce4ec 0%,#f8bbd0 55%,#f48fb1 100%);
+  box-shadow:0 4px 14px rgba(194,24,91,.18), inset 0 1px 0 rgba(255,255,255,.65);
+}
+.ov{
+  position:absolute; transform:translate(-50%, -50%);
+  font-family:"Microsoft JhengHei","Noto Sans TC","PingFang TC",sans-serif;
+  font-weight:900; white-space:nowrap; pointer-events:none;
+  text-align:center; line-height:1.15;
+  background:transparent; box-shadow:none; border:0; padding:0; margin:0;
+  max-width:none; overflow:visible;
+}
+.ov .yen{font-size:.78em; margin-left:1px}
+.ov.ov-title{
+  /* Banner cy≈9.2% of chart; title ends ~58%; keep right margin inside banner */
+  left:61%; top:9.94%; right:auto; bottom:auto;
+  transform:translateY(-50%) !important; /* override .ov translate(-50%,-50%) */
+  color:#0d2b6b; background:#fff; border:1.5px solid rgba(255,255,255,.95);
+  font-size:clamp(9px, 1.4cqw, 14px); font-weight:900;
+  letter-spacing:.02em; line-height:1;
+  height:4.2%; /* ~58–60% of banner (~7.2% chart) */
+  min-height:0;
+  padding:0 1.1cqw; border-radius:999px;
+  box-sizing:border-box;
+  display:inline-flex; align-items:center; justify-content:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+  text-shadow:none; white-space:nowrap;
+  max-width:17%;
+}
+body.theme-clx .ov.ov-title{color:#6a1b9a; background:#fff; border-color:#fff}
+.ov-red{color:#d32f2f}
+.ov-blue{color:#1565c0}
+.ov-purple{color:#6a1b9a}
+.ov-green{color:#2e7d32}
+/* positions as % of 1026x782 chart — centered on erased digit boxes */
+.ov-c1a{left:28.2%; top:30.15%; font-size:clamp(10px, 2.15cqw, 24px); max-width:8.5%}
+.ov-c1b{left:28.1%; top:37.17%; font-size:clamp(10px, 2.15cqw, 24px); max-width:9.5%}
+.ov-c2{left:55.5%; top:34.79%; font-size:clamp(9px, 2.05cqw, 22px); max-width:15%; white-space:nowrap; line-height:1.12}
+.ov-c3{left:87.9%; top:38.47%; font-size:clamp(10px, 2.15cqw, 24px); max-width:13%}
+.ov-c4{left:23.8%; top:74.13%; font-size:clamp(10px, 2.15cqw, 24px); max-width:14%}
+.ov.compact{letter-spacing:-0.02em}
+.ov.compact .yen{font-size:.75em}
+
+#unitAnchor{scroll-margin-top:12px}
+.unit-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; justify-content:space-between; margin:0 0 10px}
+.unit-head h2{margin:0}
+.unit-view-seg{flex:1 1 260px; max-width:360px; display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--cream); padding:3px; border-radius:10px}
+.unit-view-seg button{border:0; background:transparent; min-height:40px; border-radius:8px; font-weight:800; color:var(--muted); font-size:13px; line-height:1.25; padding:4px 6px}
+.unit-view-seg button.active{background:#fff; color:var(--ink); box-shadow:0 1px 4px #00000014}
+.unit-scroll{width:100%; max-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain}
+.unit-frame{border:2px solid #222; background:#fff; width:100%; min-width:0}
+table.unitpic{
+  width:100%; border-collapse:collapse; table-layout:fixed;
+  font-size:16px;
+  font-family:"Microsoft JhengHei","Noto Sans TC","PingFang TC",sans-serif;
+}
+table.unitpic col.c-lab{width:20%}
+table.unitpic col.c-u{width:20%}
+table.unitpic th, table.unitpic td{
+  border:1px solid #222; padding:8px 4px; text-align:center; vertical-align:middle;
+  line-height:1.25; overflow:hidden; word-break:break-word;
+}
+table.unitpic th.agehd{background:#f5c518; font-weight:900; font-size:16px}
+table.unitpic th.u05{background:#b8d4ef}
+table.unitpic th.u1{background:#f7e7a0}
+table.unitpic th.u2{background:#7ec8e8}
+table.unitpic th.u3{background:#f5b8c8}
+table.unitpic th.u4{background:#c5e1a5}
+table.unitpic th.u5{background:#ce93d8; color:#111}
+table.unitpic td.lab{text-align:left; padding-left:6px; font-weight:700; background:#fafafa; font-size:15px}
+table.unitpic td.c05{background:#d6e8f7}
+table.unitpic td.c1{background:#fbf3c8}
+table.unitpic td.c2{background:#b7e0f2}
+table.unitpic td.c3{background:#f8d0db}
+table.unitpic td.c4{background:#e6f4d4}
+table.unitpic td.c5{background:#e1bee7}
+table.unitpic td.num{font-variant-numeric:tabular-nums; white-space:nowrap; letter-spacing:-.02em; font-size:15px}
+table.unitpic tr.mat td{color:#c62828; font-weight:900; font-size:15px}
+table.unitpic tr.mat td.lab{background:#fff5f5; font-size:15px}
+
+#infoAnchor{scroll-margin-top:12px}
+details.info{
+  background:var(--paper); border:1px solid #142a371f; border-radius:var(--radius);
+  box-shadow:var(--shadow); margin-top:var(--gap); padding:0 14px;
+}
+details.info summary{
+  min-height:48px; display:flex; align-items:center; cursor:pointer;
+  font-weight:800; color:var(--navy); list-style:none; font-size:16px;
+}
+details.info summary::-webkit-details-marker{display:none}
+details.info summary::after{content:"▾"; margin-left:auto; color:var(--muted)}
+details.info[open] summary::after{content:"▴"}
+.benefit{border-left:4px solid var(--accent); padding:8px 10px; margin:8px 0; background:var(--accent-soft); border-radius:0 8px 8px 0}
+.benefit .title{font-weight:800; font-size:16px}
+.benefit .desc{font-size:14px; color:var(--muted)}
+.benefit .pay{font-size:15px; font-weight:800; color:var(--accent)}
+.rules{font-size:15px; line-height:1.55; padding-bottom:12px}
+.rules dt{font-weight:800; color:var(--accent); margin-top:8px}
+.rules dd{margin:2px 0 0}
+.disclaimer{font-size:14px; color:var(--muted); text-align:center; padding:16px 8px 8px; line-height:1.5}
+body.theme-clx{--accent:#c2185b; --accent-soft:#fce4ec}
+#exportMount{position:fixed; left:-10000px; top:0; width:1024px; background:#fff; z-index:-1; pointer-events:none}
+.hidden{display:none !important}
+
+/* —— 保障癌症 —— */
+.cancer-sec{padding:12px 14px 14px}
+.cancer-sec h2{margin:0 0 4px; font-size:17px; flex-wrap:wrap}
+.cancer-note{margin:0 0 8px; font-size:12.5px; color:var(--muted); line-height:1.35}
+.cancer-grid{display:grid; gap:12px; grid-template-columns:1fr}
+
+@media (min-width:900px){
+  .cancer-grid{grid-template-columns:minmax(0,1.15fr) minmax(240px,0.9fr); align-items:stretch}
+}
+.body-fig{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  background:#faf9f6; border-radius:12px; border:1px solid #142a3714;
+  padding:8px; min-height:0; overflow:hidden;
+}
+.body-fig img{width:100%; max-width:420px; height:auto; display:block; margin:0 auto}
+.body-fig.with-gpt img{max-width:100%}
+
+.body-stage{position:relative; width:100%; max-width:420px; margin:0 auto}
+.body-fig.with-gpt .body-stage{max-width:100%}
+.body-stage > img{width:100%; height:auto; display:block}
+.body-cards{position:absolute; inset:0; pointer-events:none}
+.body-card{
+  position:absolute; border-radius:16px; border:2.5px solid transparent;
+  box-sizing:border-box; transition:border-color .18s, box-shadow .18s, background .18s;
+  pointer-events:auto; cursor:pointer;
+  padding:0; margin:0; background:transparent; appearance:none; -webkit-appearance:none;
+}
+.body-card.on{
+  border-color:var(--cancer-accent,#1565c0);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--cancer-accent,#1565c0) 28%, transparent),
+             0 6px 18px color-mix(in srgb, var(--cancer-accent,#1565c0) 25%, transparent);
+  background:color-mix(in srgb, var(--cancer-accent,#1565c0) 08%, transparent);
+}
+.body-title-hit{position:absolute; pointer-events:none}
+
+body.theme-clx{--cancer-accent:#c2185b}
+body.theme-clz{--cancer-accent:#1565c0}
+.cancer-side{display:flex; flex-direction:column; gap:10px; min-height:0}
+.chip-box,.detail-box{background:#fff; border:1px solid #142a3718; border-radius:12px; padding:12px}
+.chip-title{font-size:13px; font-weight:900; color:var(--navy); margin:0 0 8px}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{
+  border:1.5px solid #d5dde4; background:#fff; border-radius:999px;
+  padding:6px 10px; font-size:12.5px; font-weight:800; color:var(--ink); cursor:pointer; line-height:1.2;
+}
+.chip:hover{border-color:var(--cancer-accent,#1565c0)}
+.chip.active{background:var(--cancer-accent,#1565c0); color:#fff; border-color:transparent}
+.detail-box{flex:1; display:flex; flex-direction:column; min-height:0}
+.detail-prompt{font-size:clamp(15px,1.8vw,18px); font-weight:900; color:var(--navy); margin:0 0 4px}
+.detail-name{font-size:clamp(16px,1.8vw,20px); font-weight:900; color:var(--cancer-accent,#1565c0); margin:0 0 2px}
+.detail-icd{font-size:11.5px; font-weight:700; color:var(--muted); margin:0 0 6px}
+.detail-one{font-size:13px; font-weight:800; color:var(--ink); margin:0 0 8px}
+.detail-years{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; margin:0 0 8px}
+.detail-year{background:#f7f5f0; border-radius:9px; padding:7px 3px; text-align:center; border:1px solid #e8e4dc}
+.detail-year .dy{display:block; font-size:10.5px; font-weight:800; color:var(--muted)}
+.detail-year .dp{display:block; font-size:clamp(12px,1.4vw,15px); font-weight:900; color:var(--cancer-accent,#1565c0); margin:2px 0}
+.detail-year .da{display:block; font-size:10.5px; font-weight:800; color:var(--ink); font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.detail-src{font-size:10px; color:#9aa6ad; line-height:1.3; margin:auto 0 0}
+
+.detail-cause{font-size:12.5px; font-weight:800; color:#455a64; line-height:1.4; margin:2px 0 6px}
+.detail-intro{font-size:13px; font-weight:700; color:var(--ink); line-height:1.4; margin:0 0 6px}
+.detail-cost{font-size:12.5px; font-weight:800; color:var(--cancer-accent,#1565c0); margin:0 0 2px; line-height:1.35}
+.detail-cost-src{font-size:10px; color:#9aa6ad; margin:0 0 8px; line-height:1.3}
+.detail-icd{display:none}
+
+@media (max-width:699px){
+  .detail-years{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+.detail-icd2{font-size:11.5px; font-weight:700; color:var(--muted); margin:0 0 6px}
+.premium-box .sub{font-size:12.5px; color:var(--muted); font-weight:600; margin-top:4px; line-height:1.4}
+.chk{display:flex; align-items:flex-start; gap:8px; margin-top:10px; font-size:14px; font-weight:700; color:#334b57; line-height:1.35; cursor:pointer}
+.chk input{margin-top:3px; width:18px; height:18px; flex:none}
+.tbd{display:inline-block; background:#fff3cd; color:#8a5a00; border:1px solid #f0c36d; border-radius:6px; padding:0 6px; font-weight:800; font-size:.92em}
+.rules strong{color:var(--ink)}
+.unit-head{justify-content:flex-start}
+
+</style>
+</head>
+<body class="theme-clz">
+<header class="topbar">
+  <div class="brand">
+    <h1>男癌／女癌試算</h1>
+  </div>
+</header>
+
+<main class="app">
+  <nav class="quicknav" aria-label="快速導覽">
+    <a href="#chartAnchor">保障圖</a>
+    <a href="#unitAnchor">單位表</a>
+    <a href="#infoAnchor">說明</a>
+  </nav>
+
+  <div class="layout">
+    <aside class="controls card" id="controls">
+      <h2>投保條件</h2>
+      <label class="field client-name">客戶姓名
+        <input type="text" id="clientName" placeholder="輸入客戶姓名" autocomplete="name" maxlength="40">
+      </label>
+      <div class="seg" id="prodSeg">
+        <button type="button" class="active" data-prod="CLZ">男性 CLZ</button>
+        <button type="button" data-prod="CLX">女性 CLX</button>
+      </div>
+      <p class="hint" id="prodHint">男性專屬｜豪愛無憂防癌定期健康保險（外溢保單）</p>
+
+      <div class="seg mode" id="ageModeSeg">
+        <button type="button" class="active" data-mode="birth">輸入生日</button>
+        <button type="button" data-mode="age">輸入歲數</button>
+      </div>
+
+      <div id="birthPanel">
+        <label class="field">生日
+          <input type="text" id="birthInput" inputmode="numeric" placeholder="例：1976/03/27 或 650327" autocomplete="off">
+        </label>
+        <p class="hint">西元 1976/03/27、19760327；民國 65/03/27、650327、0650327</p>
+      </div>
+      <div id="agePanel" class="hidden">
+        <label class="field">保險年齡（18–60）
+          <input type="number" id="ageInput" min="18" max="60" step="1" inputmode="numeric" placeholder="例：49">
+        </label>
+      </div>
+      <div class="age-line" id="ageLine"><span>請輸入生日或歲數</span></div>
+      <p class="hint">10年期 18–60 歲；20年期 18–50 歲</p>
+
+      <label class="field">繳費年期
+        <div class="seg term" id="termSeg">
+          <button type="button" data-term="10">10年</button>
+          <button type="button" data-term="20" class="active">20年</button>
+        </div>
+      </label>
+
+      <label class="field">保額（萬）
+        <div class="amt-grid" id="amtGrid">
+          <button type="button" data-amt="50">半單位<br>50萬</button>
+          <button type="button" data-amt="100" class="active">1單位<br>100萬</button>
+          <button type="button" data-amt="200">2單位<br>200萬</button>
+          <button type="button" data-amt="300">3單位<br>300萬</button>
+        </div>
+        <div class="custom-amt">
+          <input type="number" id="amtCustom" min="50" max="300" step="1" placeholder="自訂 50–300" inputmode="numeric">
+          <span>萬</span>
+        </div>
+      </label>
+      <p class="hint">最低 50 萬；累計本險種最高 300 萬</p>
+
+      <div class="premium-box" id="premiumBox">
+        <div class="lab" id="premLab">年繳保費（依目前保額）</div>
+        <div class="amt" id="premAnnual">—</div>
+        <div class="sub" id="rateNote"></div>
+        <div class="sub" id="premModal"></div>
+      </div>
+      <label class="chk"><input type="checkbox" id="payDisc"><span>已含轉帳／富邦信用卡繳費 1% 折扣（保費×99%）</span></label>
+
+      <button type="button" class="btn" id="btnDownload">下載圖片</button>
+      <p class="dl-hint" id="dlHint">下載＝保障圖＋單位試算表（桌面寬度）</p>
+    </aside>
+
+    <section class="card cancer-sec" id="cancerSec" aria-label="保障癌症">
+      <h2 id="cancerTitle">豪愛無憂 CLZ 特定癌症（9項）</h2>
+      <p class="cancer-note" id="cancerNote"></p>
+      <div class="cancer-grid">
+        <div class="body-fig" id="bodyFig">
+          <div class="body-stage" id="bodyStage">
+            <img id="bodyImg" src="gpt/body-male-gpt.png" alt="特定癌症人體圖">
+            <div class="body-cards" id="bodyCards" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="cancer-side">
+          <div class="chip-box">
+            <div class="chip-title" id="chipTitle">請選擇一種癌症</div>
+            <div class="chips" id="cancerChips" role="listbox" aria-label="特定癌症列表"></div>
+          </div>
+          <div class="detail-box" id="cancerDetail">
+            <div class="detail-prompt">請選擇一種癌症</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="maincol">
+      <div class="client-banner" id="clientBanner" aria-live="polite"></div>
+      <section class="card chart-wrap" id="chartAnchor">
+        <div class="chart-stage" id="chartStage">
+          <img class="base" id="chartBase" src="clz-base.png" width="1026" height="782" alt="保障圖">
+          <div class="ov ov-title" id="ovTitle">保額 100萬</div>
+          <div class="ov ov-red ov-c1a" id="ovC1a">100,000<span class="yen">元</span></div>
+          <div class="ov ov-red ov-c1b" id="ovC1b">1,000,000<span class="yen">元</span></div>
+          <div class="ov ov-purple ov-c2" id="ovC2">1,100,000元<br>～1,500,000元</div>
+          <div class="ov ov-blue ov-c3" id="ovC3">20,000<span class="yen">元</span></div>
+          <div class="ov ov-green ov-c4" id="ovC4">100,000<span class="yen">元</span></div>
+        </div>
+      </section>
+
+      <section class="card" id="unitAnchor">
+        <div class="unit-head">
+          <h2>單位試算表 <span class="tag" id="unitTag">20 年期</span></h2>
+        </div>
+        <div class="unit-section" id="unitSection">
+          <div class="unit-scroll">
+            <div class="unit-frame">
+              <table class="unitpic" id="unitTable">
+                <colgroup id="unitCols"></colgroup>
+                <thead>
+                  <tr id="unitHeadRow">
+                    <th class="agehd" id="unitAgeHd">—歲/男</th>
+                  </tr>
+                </thead>
+                <tbody id="unitBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="infoAnchor">
+    <details class="info">
+      <summary>保障內容說明（依目前保額）</summary>
+      <div id="benefits"></div>
+    </details>
+    <details class="info">
+      <summary>外溢回饋（健康管理保險費折扣）</summary>
+      <dl class="rules" id="spillBox"></dl>
+    </details>
+    <details class="info">
+      <summary>投保規則摘要</summary>
+      <dl class="rules" id="rulesBox"></dl>
+    </details>
+  </div>
+  <p class="disclaimer" id="disclaimer"></p>
+</main>
+<div id="exportMount" aria-hidden="true"></div>
+
+<script>
+/* =====================================================================
+ * 【可編輯參數區】要改費率、給付比例、年齡／保額限制，只需修改本區（以下到「程式邏輯」之前）。
+ * 資料來源：富邦人壽 CLZ／CLX 年繳費率表、DM（CLZ 115.04.29、CLX 115.02.10）、保單條款。
+ * ===================================================================== */
+
+/* ---- 1) 保費費率：年繳、元／每萬元保額（標準體）----
+ * 結構：RATES[商品][繳費年期][保險年齡 − RATE_MIN_AGE]；陣列第 0 個元素 = RATE_MIN_AGE 歲。
+ * null = 該年齡／年期不可投保（費率表「--」）。要新增年齡，往陣列後面補值即可（同時更新 AGE_MAX_BY_TERM）。
+ * 例：CLZ 10年期 49歲 → RATES.CLZ[10][49-18] = 838。
+ * 【對照用例（用戶提供參考圖）】CLZ 49歲 20年期：官方費率 575 元/萬 → 100萬年繳 57,500；
+ *   參考圖 56,925 = 57,500 × 0.99（即已含「轉帳繳費 1% 折扣」，見 PAY_DISCOUNT）。
+ *   CLX 35歲 20年期：官方 325 元/萬 → 100萬年繳 32,500，與參考圖相同（未折扣）。 */
+const RATE_MIN_AGE = 18;
+const RATES = {
+  CLZ: {
+    10: [
+      420,430,439,450,461,472,483,494,504,515,  // 保險年齡 18–27
+      526,537,548,562,576,590,604,618,632,646,  // 保險年齡 28–37
+      660,674,688,705,721,738,755,772,788,805,  // 保險年齡 38–47
+      822,838,855,888,922,955,988,1022,1055,1088,  // 保險年齡 48–57
+      1121,1155,1188,  // 保險年齡 58–60
+    ],
+    20: [
+      222,228,233,239,246,252,258,265,271,277,  // 保險年齡 18–27
+      283,290,296,306,315,325,334,344,354,363,  // 保險年齡 28–37
+      373,382,392,412,433,453,473,494,514,534,  // 保險年齡 38–47
+      554,575,595,null,null,null,null,null,null,null,  // 保險年齡 48–57
+      null,null,null,  // 保險年齡 58–60
+    ],
+  },
+  CLX: {
+    10: [
+      435,440,445,450,455,460,465,470,480,490,  // 保險年齡 18–27
+      500,510,515,525,535,545,555,565,575,580,  // 保險年齡 28–37
+      590,600,610,620,630,640,650,660,670,680,  // 保險年齡 38–47
+      690,700,710,720,730,740,755,765,780,795,  // 保險年齡 48–57
+      825,845,880,  // 保險年齡 58–60
+    ],
+    20: [
+      230,235,240,245,250,255,260,265,270,275,  // 保險年齡 18–27
+      280,285,290,295,300,310,315,325,330,335,  // 保險年齡 28–37
+      345,350,355,365,370,380,390,400,410,420,  // 保險年齡 38–47
+      435,450,470,null,null,null,null,null,null,null,  // 保險年齡 48–57
+      null,null,null,  // 保險年齡 58–60
+    ],
+  }
+};
+
+/* ---- 2) 投保年齡（足歲換算後之「保險年齡」）----  DM：10年期 18～60；20年期 18～50 */
+const AGE_MIN = 18;
+const AGE_MAX_BY_TERM = {10:60, 20:50};
+const AGE_MAX_ANY = Math.max.apply(null, Object.values(AGE_MAX_BY_TERM));
+const TERMS = [10, 20];                // 繳費年期（年）
+
+/* ---- 3) 保額（萬元，以萬元為單位）----  DM：最低 50 萬；累計本險種最高 300 萬 */
+const AMT_MIN = 50;
+const AMT_MAX = 300;
+const AMT_QUICK = [50, 100, 200, 300]; // 快速選擇按鈕（需與 HTML #amtGrid 的 data-amt 一致）
+const UNIT_VIEW_UNITS = [50, 100, 200, 300]; // 單位試算表欄位（半單位、1、2、3單位）
+
+/* ---- 4) 給付比例（% 為「保額」的百分比）---- 條款第十三～十七條 */
+const BENEFIT = {
+  earlyMildPct: 10,        // 初期／輕度癌症：第2保單年度起 保額×10%（第1保單年度為 年繳保費總和×1.06）
+  severePct: 100,          // 重度癌症：第2保單年度起 保額×100%
+  surgeryPct: 2,           // 特定手術 保額×2%（限1次）
+  illnessPct: 10,          // 特定傷病 保額×10%（第2保單年度起、限1次）
+  maturityFactor: 1.06,    // 滿期／身故：年繳保險費總和×1.06 − 已領保險金累計
+  maturityAge: 89          // 保險年齡屆滿 89 歲仍生存給付滿期保險金
+};
+/* 特定癌症（重度）加成：第2年起另給（條款第十五條）。要調整請改下表。 */
+const SPECIFIC_BONUS = [
+  {year:'第2保單年度', pct:10},
+  {year:'第3保單年度', pct:20},
+  {year:'第4保單年度', pct:30},
+  {year:'第5保單年度', pct:40},
+  {year:'第6保單年度起', pct:50}
+];
+
+/* ---- 5) 繳別與折扣 ---- */
+const MODAL = {semi:0.52, qtr:0.262, mon:0.088};  // 半年繳／季繳／月繳 費率 = 年繳費率 ×係數（費率表註）
+const PAY_DISCOUNT = 0.01;   // 首期匯款、首／續期轉帳或富邦信用卡、續期自行繳費：總應收保費 1% 折扣
+const HEALTH_DISCOUNT = 0.01; // 健康管理保險費折扣：第2保單年度起，需於指定期間提供健康檢查報告（外溢回饋）
+
+/* ---- 6) 商品資訊（顯示文字）---- */
+const META = {
+  CLZ: {
+    full:'富邦人壽豪愛無憂防癌定期健康保險（外溢保單）（CLZ）｜男性專屬',
+    docNo:'115.04.29 富壽商精字第 1150000970 號函備查',
+    short:'男性專屬｜豪愛無憂防癌定期健康保險（外溢保單）',
+    sex:'男', pill:'男性 CLZ', honorific:'先生',
+    cancers:'結腸、直腸乙狀結腸連接處、直腸、肛門及肛(門)管、陰莖、攝護腺、睪丸、其他及未明示男性生殖器官、膀胱惡性腫瘤等 9 項（條款附表一）',
+    cancerN:9, surgeryN:8,
+    surgery:'攝護腺／前列腺相關手術共 8 項（條款附表二）',
+    illness:'主動脈外科置換手術、嚴重肝硬化症（共 2 項）',
+    bonusLab:'男性癌症加成合計(例：第6年)',
+    illShort:'主動脈置換/嚴重肝硬化'
+  },
+  CLX: {
+    full:'富邦人壽真馨相守防癌定期健康保險（外溢保單）（CLX）｜女性專屬',
+    docNo:'115.02.10 富壽商精字第 1140005477 號函備查',
+    short:'女性專屬｜真馨相守防癌定期健康保險（外溢保單）',
+    sex:'女', pill:'女性 CLX', honorific:'小姐',
+    cancers:'皮膚、乳房、外陰、陰道、子宮頸、子宮體、未明示部位子宮、卵巢、其他及未明示女性生殖器官、胎盤惡性腫瘤等 11 項（條款附表一）',
+    cancerN:11, surgeryN:14,
+    surgery:'尿失禁／骨盆底相關手術共 14 項（條款附表二）',
+    illness:'嚴重全身性紅斑性狼瘡腎病變、嚴重類風濕性關節炎（共 2 項）',
+    bonusLab:'婦科癌症加成合計(例：第6年)',
+    illShort:'紅斑性狼瘡/類風濕性'
+  }
+};
+const BASE_IMG = {CLZ:'clz-base.png', CLX:'clx-base.png'};
+
+/* =====================================================================
+ * 程式邏輯（一般不需修改）
+ * ===================================================================== */
+const state={prod:'CLZ', term:20, age:49, amount:100, mode:'birth', clientName:'', payDisc:false};
+const UNIT_VIEWS={
+  low:{units:UNIT_VIEW_UNITS, cls:['c05','c1','c2','c3'], th:[['u05','半單位'],['u1','1單位'],['u2','2單位'],['u3','3單位']]}
+};
+state.unitView='low';
+const OVERLAY_MAX_PCT={ovC1a:8.5, ovC1b:9.5, ovC2:15.0, ovC3:13.0, ovC4:14.0};
+const OVERLAY_BASE_CQW={ovC1a:2.15, ovC1b:2.15, ovC2:2.05, ovC3:2.15, ovC4:2.15};
+
+/** 特定癌症（重度）：條款附表一；項目與 ICD-10-CM 代碼已與 CLZ／CLX 條款附表一逐項核對。加成％依保單年度（第十五條），非依癌別。 */
+const SPECIFIC_CANCERS = {
+  CLZ: {
+    product: '豪愛無憂', code: 'CLZ', count: 9,
+    title: '豪愛無憂 CLZ 特定癌症（9項）',
+    body: 'assets/body-male.png', gptBody: 'gpt/body-male-gpt.png',
+    source: 'CLZ條款 附表一（特定癌症（重度））／第十五條',
+    items: [
+      {id:'c18', short:'結腸癌', callout:'colo',
+        cause:'飲食低纖、紅肉加工肉、肥胖、家族史', causeSrc:'國健署',
+        intro:'大腸常見惡性腫瘤，早期常無明顯症狀。',
+        cost:'自費標靶約 每月10～30萬', costSrc:'公開藥價整理（癌思停／爾必得舒等）'},
+      {id:'c19', short:'直腸乙狀結腸癌', callout:'rect',
+        cause:'飲食低纖、紅肉加工肉、肥胖、家族史', causeSrc:'國健署',
+        intro:'直腸與乙狀結腸交接處的惡性腫瘤。',
+        cost:'自費標靶約 每月10～30萬', costSrc:'公開藥價整理（癌思停／爾必得舒等）'},
+      {id:'c20', short:'直腸癌', callout:'rect',
+        cause:'飲食低纖、紅肉加工肉、肥胖、缺乏運動', causeSrc:'國健署',
+        intro:'靠近肛門的大腸惡性腫瘤，可影響排便。',
+        cost:'自費標靶約 每月10～30萬', costSrc:'公開藥價整理（癌思停／爾必得舒等）'},
+      {id:'c21', short:'肛門癌', callout:'rect',
+        cause:'HPV感染、吸菸、免疫抑制', causeSrc:'ACS／醫院HPV衛教',
+        intro:'肛門及肛管的惡性腫瘤，相對少見。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c60', short:'陰莖癌', callout:'penile',
+        cause:'HPV、包皮衛生不良、吸菸', causeSrc:'台灣男性學暨性醫學醫學會',
+        intro:'陰莖皮膚或黏膜的惡性腫瘤，相對少見。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c61', short:'攝護腺癌', callout:'prostate',
+        cause:'年齡、家族史、高脂飲食', causeSrc:'衛福部／慈濟醫院衛教',
+        intro:'男性常見癌症，早期常無明顯症狀。',
+        cost:'新一代口服荷爾蒙自費約 每月10萬', costSrc:'臺大泌尿部／楓城泌尿學會衛教'},
+      {id:'c62', short:'睪丸癌', callout:'testis',
+        cause:'隱睪、家族史、年輕男性', causeSrc:'NCI／睪丸癌基金會',
+        intro:'好發於年輕男性的睪丸惡性腫瘤。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c63', short:'其他男性生殖器癌', callout:'penile',
+        cause:'HPV、衛生不良、慢性發炎', causeSrc:'台灣泌尿科醫學會指引',
+        intro:'其他及未明示男性生殖器官惡性腫瘤。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c67', short:'膀胱癌', callout:'bladder',
+        cause:'吸菸、化學染劑暴露、慢性發炎', causeSrc:'大林慈濟醫院衛教',
+        intro:'泌尿系統常見惡性腫瘤，血尿為重要警訊。',
+        cost:'自費免疫約 每次5～15萬', costSrc:'亞東醫院腫瘤科說明'}
+    ],
+    callouts: [{"id": "colo", "organ": "結腸癌", "box": {"left": 1.758, "top": 24.792, "width": 24.609, "height": 7.847}, "items": ["c18"]}, {"id": "bladder", "organ": "膀胱癌", "box": {"left": 1.758, "top": 44.444, "width": 24.609, "height": 7.917}, "items": ["c67"]}, {"id": "testis", "organ": "睪丸癌", "box": {"left": 1.758, "top": 60.208, "width": 24.609, "height": 7.986}, "items": ["c62"]}, {"id": "rect", "organ": "直腸乙狀結腸癌", "box": {"left": 73.535, "top": 31.944, "width": 24.512, "height": 7.847}, "items": ["c19", "c20", "c21"]}, {"id": "prostate", "organ": "攝護腺癌", "box": {"left": 73.535, "top": 46.528, "width": 24.414, "height": 7.917}, "items": ["c61"]}, {"id": "penile", "organ": "陰莖癌・其他", "box": {"left": 73.535, "top": 60.278, "width": 24.512, "height": 7.917}, "items": ["c60", "c63"]}]
+  },
+  CLX: {
+    product: '真馨相守', code: 'CLX', count: 11,
+    title: '真馨相守 CLX 特定癌症（11項）',
+    body: 'assets/body-female.png', gptBody: 'gpt/body-female-gpt.png',
+    source: 'CLX條款 附表一（特定癌症（重度））／第十五條',
+    items: [
+      {id:'c43', short:'惡性黑色素瘤', callout:'skin',
+        cause:'紫外線、曬傷、多痣、家族史', causeSrc:'Skin Cancer Foundation／WHO',
+        intro:'惡性度較高的皮膚色素細胞癌。',
+        cost:'自費免疫約 每月18～25萬', costSrc:'公開整理（免疫檢查點抑制劑月費）'},
+      {id:'c44', short:'其他皮膚惡性腫瘤', callout:'skin',
+        cause:'長期日曬、紫外線暴露', causeSrc:'WHO紫外線說明',
+        intro:'皮膚其他及未明示之惡性腫瘤。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c50', short:'乳癌', callout:'breast',
+        cause:'家族史、停經後肥胖、未生育', causeSrc:'衛福部／林口長庚',
+        intro:'台灣女性發生率最高的癌症。',
+        cost:'自費標靶／新藥約 每月10～20萬', costSrc:'中央社／病友案例（轉移新藥月費約20萬）'},
+      {id:'c51', short:'外陰癌', callout:'pelvic',
+        cause:'HPV感染、吸菸、慢性刺激', causeSrc:'醫院HPV六癌衛教',
+        intro:'外陰部位的惡性腫瘤，相對少見。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c52', short:'陰道癌', callout:'pelvic',
+        cause:'HPV感染、子宮頸癌病史', causeSrc:'醫院HPV六癌衛教',
+        intro:'陰道黏膜的惡性腫瘤，相對少見。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c53', short:'子宮頸癌', callout:'cervix',
+        cause:'HPV持續感染、過早性行為、吸菸', causeSrc:'衛福部／國健署',
+        intro:'可透過抹片與疫苗預防的婦癌。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c54', short:'子宮體癌', callout:'uterus',
+        cause:'肥胖、糖尿病、雌激素暴露', causeSrc:'國健署',
+        intro:'多為子宮內膜癌，常見於停經前後。',
+        cost:'部分化療／標靶須自費，一年可逾百萬', costSrc:'TVBS／癌症希望基金會病友調查'},
+      {id:'c55', short:'子宮惡性腫瘤', callout:'uterus',
+        cause:'肥胖、月經異常、婦癌家族史', causeSrc:'國健署',
+        intro:'未明示部位的子宮惡性腫瘤。',
+        cost:'部分化療／標靶須自費，一年可逾百萬', costSrc:'TVBS／癌症希望基金會病友調查'},
+      {id:'c56', short:'卵巢癌', callout:'ovary',
+        cause:'家族史、未生育、肥胖', causeSrc:'郭綜合醫院／林口長庚',
+        intro:'早期症狀不明顯，常較晚才發現。',
+        cost:'PARP抑制劑自費約 每月十餘萬', costSrc:'《康健》癌症專題／鄭文芳醫師'},
+      {id:'c57', short:'其他女性生殖器癌', callout:'pelvic',
+        cause:'HPV感染、慢性發炎', causeSrc:'醫院HPV相關衛教',
+        intro:'其他及未明示女性生殖器官惡性腫瘤。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+      {id:'c58', short:'胎盤癌', callout:'pelvic',
+        cause:'葡萄胎病史、高齡懷孕', causeSrc:'ACS妊娠滋養細胞腫瘤',
+        intro:'與妊娠相關的罕見惡性腫瘤。',
+        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'}
+    ],
+    callouts: [{"id": "breast", "organ": "乳癌", "box": {"left": 3.711, "top": 2.045, "width": 26.953, "height": 11.468}, "items": ["c50"]}, {"id": "ovary", "organ": "卵巢癌", "box": {"left": 3.516, "top": 42.221, "width": 25.586, "height": 9.642}, "items": ["c56"]}, {"id": "pelvic", "organ": "外陰・陰道・胎盤癌", "box": {"left": 3.32, "top": 62.6, "width": 27.246, "height": 11.103}, "items": ["c51", "c52", "c57", "c58"]}, {"id": "skin", "organ": "皮膚癌", "box": {"left": 69.531, "top": 11.322, "width": 27.051, "height": 11.468}, "items": ["c43", "c44"]}, {"id": "uterus", "organ": "子宮體癌", "box": {"left": 71.191, "top": 38.13, "width": 25.488, "height": 10.153}, "items": ["c54", "c55"]}, {"id": "cervix", "organ": "子宮頸癌", "box": {"left": 69.434, "top": 57.341, "width": 27.246, "height": 11.03}, "items": ["c53"]}]
+  }
+};
+
+/** 條款附表一官方疾病名稱（ICD-10-CM） */
+const ICD_NAMES={
+  c18:'結腸惡性腫瘤', c19:'直腸乙狀結腸連接處惡性腫瘤', c20:'直腸惡性腫瘤', c21:'肛門及肛(門)管惡性腫瘤',
+  c60:'陰莖惡性腫瘤', c61:'攝護腺惡性腫瘤', c62:'睪丸之惡性腫瘤', c63:'其他及未明示男性生殖器官之惡性腫瘤', c67:'膀胱惡性腫瘤',
+  c43:'皮膚惡性黑色素瘤', c44:'皮膚之其他及未明示惡性腫瘤', c50:'乳房惡性腫瘤', c51:'外陰惡性腫瘤', c52:'陰道惡性腫瘤',
+  c53:'子宮頸惡性腫瘤', c54:'子宮體惡性腫瘤', c55:'未明示部位子宮惡性腫瘤', c56:'卵巢惡性腫瘤',
+  c57:'其他及未明示女性生殖器官之惡性腫瘤', c58:'胎盤惡性腫瘤'
+};
+Object.keys(SPECIFIC_CANCERS).forEach(function(k){ SPECIFIC_CANCERS[k].items.forEach(function(it){ it.official=ICD_NAMES[it.id]||''; }); });
+
+let selectedCancerId = null;
+
+function todayDate(){const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate());}
+function todayStr(){const t=todayDate(); return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+function calcInsuranceAge(birthdayISO){
+  const b=new Date(birthdayISO+'T00:00:00');
+  const d=todayDate();
+  if(isNaN(b)||d<b) return null;
+  let years=d.getFullYear()-b.getFullYear();
+  let lastBD=new Date(d.getFullYear(), b.getMonth(), b.getDate());
+  if(lastBD>d){ years-=1; lastBD=new Date(d.getFullYear()-1, b.getMonth(), b.getDate()); }
+  const actual=years;
+  const six=new Date(lastBD); six.setMonth(six.getMonth()+6);
+  return {actual, ins: d>six ? actual+1 : actual, lastBD, asOf:d};
+}
+function fmt(n){ if(n==null||isNaN(n)) return '—'; return Math.round(n).toLocaleString('zh-TW'); }
+/** 可含小數（最多 2 位）：年繳／年存可能出現 28,462.5 這類半單位金額 */
+function fmtD(n){ if(n==null||isNaN(n)) return '—'; return (Math.round(n*100)/100).toLocaleString('zh-TW',{maximumFractionDigits:2}); }
+function moneyWan(wan,pct){ return Math.round(wan*10000*(pct/100)); }
+function ratesFor(prod,term){ return (RATES[prod]||{})[term]||[]; }
+/** 元／每萬元保額；查不到（年齡超出範圍、費率表為 --、或尚未填入）回傳 null */
+function rateOf(age,term){
+  if(age==null||age<AGE_MIN||age>AGE_MAX_BY_TERM[term]) return null;
+  const v=ratesFor(state.prod,term)[age-RATE_MIN_AGE];
+  return (v==null||isNaN(v)) ? null : v;
+}
+/** 實繳年繳保費（元／萬 × 保額萬 × 折扣） */
+function annualPremium(rate,wan){
+  if(rate==null) return null;
+  return rate*wan*(state.payDisc ? (1-PAY_DISCOUNT) : 1);
+}
+
+function parseBirth(raw){
+  const s=(raw||'').trim();
+  if(!s) return {ok:false, err:'請輸入生日'};
+  let m, y, mo, da, roc=false;
+  m=s.match(/^(\d{4})[\/\-\.年](\d{1,2})[\/\-\.月](\d{1,2})日?$/);
+  if(m){ y=+m[1]; mo=+m[2]; da=+m[3]; }
+  else {
+    m=s.match(/^(\d{2,3})[\/\-\.年](\d{1,2})[\/\-\.月](\d{1,2})日?$/);
+    if(m){ roc=true; y=+m[1]+1911; mo=+m[2]; da=+m[3]; }
+  }
+  if(!m){
+    const d=s.replace(/\D/g,'');
+    if(/^\d{8}$/.test(d)){ y=+d.slice(0,4); mo=+d.slice(4,6); da=+d.slice(6,8); m=true; }
+    else if(/^\d{7}$/.test(d)){ roc=true; y=+d.slice(0,3)+1911; mo=+d.slice(3,5); da=+d.slice(5,7); m=true; }
+    else if(/^\d{6}$/.test(d)){ roc=true; y=+d.slice(0,2)+1911; mo=+d.slice(2,4); da=+d.slice(4,6); m=true; }
+  }
+  if(!m) return {ok:false, err:'格式無法辨識。例：1998/03/27 或 870327'};
+  if(mo<1||mo>12||da<1||da>31) return {ok:false, err:'生日日期無效'};
+  const iso=`${y}-${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`;
+  const info=calcInsuranceAge(iso);
+  if(!info) return {ok:false, err:'生日無效或晚於今天'};
+  if(info.ins<AGE_MIN||info.ins>AGE_MAX_ANY) return {ok:false, err:`保險年齡 ${info.ins} 超出可投保範圍 ${AGE_MIN}～${AGE_MAX_ANY}`};
+  return {ok:true, info, iso, roc, display:`${y}/${String(mo).padStart(2,'0')}/${String(da).padStart(2,'0')}`};
+}
+
+function setTheme(){
+  const m=META[state.prod];
+  document.body.className = state.prod==='CLX' ? 'theme-clx' : 'theme-clz';
+  document.getElementById('prodHint').textContent = m.short;
+  document.getElementById('chartBase').src = BASE_IMG[state.prod];
+  scheduleFitOverlays();
+  document.querySelectorAll('#prodSeg button').forEach(b=>b.classList.toggle('active', b.dataset.prod===state.prod));
+}
+
+function updateTermButtons(){
+  const age=state.age;
+  if(age!=null && age>AGE_MAX_BY_TERM[state.term]){
+    const fb=TERMS.find(x=>age<=AGE_MAX_BY_TERM[x]);
+    if(fb) state.term=fb;
+  }
+  document.querySelectorAll('#termSeg button').forEach(b=>{
+    const t=+b.dataset.term;
+    b.disabled=!(age!=null && age>=AGE_MIN && age<=AGE_MAX_BY_TERM[t]);
+    b.classList.toggle('active', t===state.term && !b.disabled);
+  });
+}
+
+function updateAmtButtons(){
+  document.querySelectorAll('#amtGrid button').forEach(b=>{
+    b.classList.toggle('active', +b.dataset.amt===state.amount);
+  });
+  const c=document.getElementById('amtCustom');
+  if(document.activeElement!==c){
+    c.value = AMT_QUICK.includes(state.amount) ? '' : state.amount;
+  }
+}
+
+function chartImageWidth(root){
+  const stage = root || document.getElementById('chartStage');
+  if(!stage) return 0;
+  const img = stage.querySelector('img.base') || document.getElementById('chartBase');
+  const w = (img && img.clientWidth) ? img.clientWidth : stage.clientWidth;
+  return w || 0;
+}
+
+function fitOverlay(el, maxPct, root){
+  const stage = root || document.getElementById('chartStage');
+  if(!stage) return;
+  const W = chartImageWidth(stage);
+  if(!W) return;
+  const maxPx = Math.max(4, W * (maxPct/100));
+  const baseCqw = OVERLAY_BASE_CQW[el.id] || 2.1;
+  const fsCap = el.id==='ovC2' ? 22 : 24;
+  const softFloor = Math.max(7, W * 0.008);
+  let fs = Math.min(fsCap, Math.max(softFloor, W * (baseCqw/100)));
+  el.style.maxWidth = maxPx + 'px';
+  el.style.letterSpacing = '';
+  const maxH = el.id==='ovC2' ? stage.clientHeight * 0.12 : stage.clientHeight * 0.065;
+  for(let i=0;i<48;i++){
+    el.style.fontSize = fs + 'px';
+    if(el.scrollWidth <= maxPx + 0.5 && el.scrollHeight <= maxH + 0.5) break;
+    fs *= 0.92;
+    if(fs < softFloor){
+      el.style.letterSpacing = '-0.04em';
+    }
+    if(fs < 6){
+      fs = 6;
+      el.style.fontSize = fs + 'px';
+      el.style.letterSpacing = '-0.08em';
+      if(el.scrollWidth > maxPx + 0.5){
+        const sx = maxPx / el.scrollWidth;
+        el.style.transform = 'translate(-50%, -50%) scaleX('+sx.toFixed(4)+')';
+      }
+      break;
+    }
+  }
+  if(el.scrollWidth <= maxPx + 0.5){
+    el.style.transform = 'translate(-50%, -50%)';
+  }
+}
+
+function fitAllOverlays(root){
+  const stage = root || document.getElementById('chartStage');
+  if(!stage) return;
+  const live = !root || root === document.getElementById('chartStage');
+  if(live){
+    Object.keys(OVERLAY_MAX_PCT).forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) fitOverlay(el, OVERLAY_MAX_PCT[id], stage);
+    });
+    return;
+  }
+  const classMap={ovC1a:'.ov-c1a', ovC1b:'.ov-c1b', ovC2:'.ov-c2', ovC3:'.ov-c3', ovC4:'.ov-c4'};
+  Object.keys(OVERLAY_MAX_PCT).forEach(id=>{
+    const el=root.querySelector(classMap[id]);
+    if(el){ el.id=id; fitOverlay(el, OVERLAY_MAX_PCT[id], root); el.removeAttribute('id'); }
+  });
+}
+
+function scheduleFitOverlays(){
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=> fitAllOverlays()); });
+}
+
+function renderOverlays(){
+  const wan=state.amount||100;
+  document.getElementById('ovTitle').textContent = `保額 ${wan}萬`;
+  const yen = '<span class="yen">元</span>';
+  const long = wan >= 200;
+  ['ovC1a','ovC1b','ovC2','ovC3','ovC4'].forEach(id=>{
+    document.getElementById(id).classList.toggle('compact', long);
+  });
+  const maxBonus=SPECIFIC_BONUS[SPECIFIC_BONUS.length-1].pct, minBonus=SPECIFIC_BONUS[0].pct;
+  document.getElementById('ovC1a').innerHTML = fmt(moneyWan(wan,BENEFIT.earlyMildPct))+yen;
+  document.getElementById('ovC1b').innerHTML = fmt(moneyWan(wan,BENEFIT.severePct))+yen;
+  document.getElementById('ovC2').innerHTML = fmt(moneyWan(wan,BENEFIT.severePct+minBonus))+'元<br>～'+fmt(moneyWan(wan,BENEFIT.severePct+maxBonus))+'元';
+  document.getElementById('ovC3').innerHTML = fmt(moneyWan(wan,BENEFIT.surgeryPct))+yen;
+  document.getElementById('ovC4').innerHTML = fmt(moneyWan(wan,BENEFIT.illnessPct))+yen;
+  scheduleFitOverlays();
+}
+
+function renderPremium(){
+  const wan=state.amount||100;
+  const rate=rateOf(state.age, state.term);
+  const el=document.getElementById('premAnnual');
+  const modal=document.getElementById('premModal');
+  const note=document.getElementById('rateNote');
+  const lab=document.getElementById('premLab');
+  lab.textContent = state.payDisc ? '年繳保費（依目前保額，已含轉帳 1% 折扣）' : '年繳保費（依目前保額）';
+  if(rate==null){
+    el.textContent='—';
+    modal.textContent='';
+    let why;
+    if(state.age==null) why='請先輸入生日或歲數。';
+    else if(state.age<AGE_MIN || state.age>AGE_MAX_ANY) why=`保險年齡 ${state.age} 歲不在可投保範圍（${AGE_MIN}～${AGE_MAX_ANY} 歲）。`;
+    else if(state.age>AGE_MAX_BY_TERM[state.term]) why=`${state.term}年期投保年齡上限 ${AGE_MAX_BY_TERM[state.term]} 歲。`;
+    else why='此年齡／年期費率未填入（請至程式最上方 RATES 補齊）。';
+    note.textContent=why;
+    return;
+  }
+  note.textContent=`費率 ${fmtD(rate)} 元／每萬元保額（${state.term}年期・${state.age}歲）`;
+  const annual=annualPremium(rate,wan);
+  el.textContent = fmtD(annual)+' 元';
+  modal.textContent = `半年繳 ${fmt(annual*MODAL.semi)}｜季繳 ${fmt(annual*MODAL.qtr)}｜月繳 ${fmt(annual*MODAL.mon)} 元（概算，以實際核保為準）`;
+}
+
+function clientNameTrim(){ return (state.clientName||'').trim(); }
+function clientHonorific(){ return META[state.prod].honorific; }
+function renderClientBanner(){
+  const el=document.getElementById('clientBanner');
+  const name=clientNameTrim();
+  if(!name){ el.classList.remove('show'); el.textContent=''; return; }
+  el.textContent = `${name} ${clientHonorific()} 專屬試算`;
+  el.classList.add('show');
+}
+
+function renderUnitTable(){
+  const age=state.age, term=state.term, m=META[state.prod];
+  const rate=rateOf(age, term);
+  const view=UNIT_VIEWS[state.unitView]||UNIT_VIEWS.low;
+  const units=view.units;
+  const cls=view.cls;
+  document.getElementById('unitAgeHd').textContent = (age!=null?age:'—')+'歲/'+m.sex;
+  document.getElementById('unitTag').textContent = term+' 年期';
+  const cols=document.getElementById('unitCols');
+  if(cols){
+    cols.innerHTML = '<col class="c-lab">' + units.map(()=>'<col class="c-u">').join('');
+  }
+  const head=document.getElementById('unitHeadRow');
+  if(head){
+    const ageTh=document.getElementById('unitAgeHd');
+    head.innerHTML='';
+    head.appendChild(ageTh);
+    view.th.forEach(([c,lab])=>{
+      const th=document.createElement('th');
+      th.className=c; th.textContent=lab;
+      head.appendChild(th);
+    });
+  }
+  const dashes = units.map(()=> '—');
+  const cell=(vals)=>vals.map((v,i)=>`<td class="${cls[i]}${v.num?' num':''}">${v.t}</td>`).join('');
+  const T=(arr,num)=>arr.map(t=>({t:t,num:!!num}));
+  const maxBonus=SPECIFIC_BONUS[SPECIFIC_BONUS.length-1].pct;
+  const bonusShort = state.prod==='CLZ' ? '男性癌症加成合計(例：第6年)' : '婦科癌症加成合計(例：第6年)';
+  const illShort = m.illShort;
+  const benefitRows=[
+    ['保額', T(units.map(u=>u+'萬'))],
+    ['重度癌症', T(units.map(u=>(u*BENEFIT.severePct/100)+'萬'))],
+    [bonusShort, T(units.map(u=>(u*(BENEFIT.severePct+maxBonus)/100)+'萬'))],
+    [illShort, T(units.map(u=>(u*BENEFIT.illnessPct/100)+'萬'))]
+  ];
+  let calcRows;
+  if(rate==null){
+    calcRows=[
+      ['滿期金', T(dashes,true), true],
+      ['年存', T(dashes,true)],
+      ['平均一個月', T(dashes,true)]
+    ];
+  } else {
+    const annuals=units.map(u=>annualPremium(rate,u));
+    const mats=annuals.map(a=>Math.round(a*term*BENEFIT.maturityFactor));
+    const months=annuals.map(a=>Math.round(a/12));
+    calcRows=[
+      ['滿期金', T(mats.map(fmt),true), true],
+      ['年存', T(annuals.map(fmtD),true)],
+      ['平均一個月', T(months.map(fmt),true)]
+    ];
+  }
+  const rows=benefitRows.map(r=>[r[0],r[1],false]).concat(calcRows.map(r=>[r[0],r[1],!!r[2]]));
+  document.getElementById('unitBody').innerHTML = rows.map(([lab,vals,isMat])=>{
+    return `<tr${isMat?' class="mat"':''}><td class="lab">${lab}</td>${cell(vals)}</tr>`;
+  }).join('');
+}
+
+function renderBenefits(){
+  const wan=state.amount||100;
+  const m=META[state.prod];
+  const rate=rateOf(state.age, state.term);
+  const annual=annualPremium(rate,wan);
+  const first=annual!=null?Math.round(annual*BENEFIT.maturityFactor):null;
+  const maturity=annual!=null?Math.round(annual*state.term*BENEFIT.maturityFactor):null;
+  const b=BENEFIT, lo=SPECIFIC_BONUS[0].pct, hi=SPECIFIC_BONUS[SPECIFIC_BONUS.length-1].pct;
+  const ladder=SPECIFIC_BONUS.map(s=>`${s.year.replace('保單年度','')} ${fmt(moneyWan(wan,b.severePct+s.pct))}`).join('｜');
+  document.getElementById('benefits').innerHTML=`
+    <div class="benefit"><div class="title">① 一般癌症（限給付1次）</div>
+      <div class="desc">第1保單年度：年繳保險費總和×${b.maturityFactor}${first!=null?`（約 ${fmt(first)} 元）`:''}；第2保單年度起：</div>
+      <div class="pay">初期/輕度 ${fmt(moneyWan(wan,b.earlyMildPct))} 元（${b.earlyMildPct}％）｜重度 ${fmt(moneyWan(wan,b.severePct))} 元（${b.severePct}％）</div></div>
+    <div class="benefit"><div class="title">② 特定癌症（重度）加成｜${m.cancerN} 項｜第2保單年度起（限1次）</div>
+      <div class="desc">${m.cancers}</div>
+      <div class="pay">${fmt(moneyWan(wan,b.severePct+lo))}～${fmt(moneyWan(wan,b.severePct+hi))} 元（${b.severePct+lo}％～${b.severePct+hi}％）</div>
+      <div class="desc">各年度（重度保險金＋加成）：${ladder}</div></div>
+    <div class="benefit"><div class="title">③ 特定手術｜${m.surgeryN} 項（限給付1次）</div>
+      <div class="desc">${m.surgery}</div>
+      <div class="pay">${fmt(moneyWan(wan,b.surgeryPct))} 元（${b.surgeryPct}％）</div></div>
+    <div class="benefit"><div class="title">④ 特定傷病｜第2保單年度起（限給付1次）</div>
+      <div class="desc">${m.illness}</div>
+      <div class="pay">${fmt(moneyWan(wan,b.illnessPct))} 元（${b.illnessPct}％）</div></div>
+    <div class="benefit"><div class="title">⑤ 豁免保險費</div>
+      <div class="pay">首次罹患癌症（重度）或意外傷害致成 1～6 級失能 → 豁免續期保險費（不含附約），契約繼續有效</div></div>
+    <div class="benefit"><div class="title">⑥ 滿期保險金（保險年齡屆滿 ${b.maturityAge} 歲仍生存）</div>
+      <div class="pay">年繳保險費總和×${b.maturityFactor} − 已領保險金累計${maturity!=null?`｜無理賠約 ${fmt(maturity)} 元`:''}</div></div>
+    <div class="benefit"><div class="title">⑦ 身故保險金／喪葬費用保險金</div>
+      <div class="pay">當年度保險金額（＝年繳保險費總和×${b.maturityFactor} − 已領保險金累計）｜無解約金</div></div>`;
+}
+
+function renderSpill(){
+  const m=META[state.prod];
+  const rate=rateOf(state.age, state.term);
+  const wan=state.amount||100;
+  let ex='';
+  if(rate!=null){
+    const a0=rate*wan*(state.payDisc?(1-PAY_DISCOUNT):1);
+    ex=`<dt>以目前試算為例</dt><dd>第1保單年度年繳 ${fmtD(a0)} 元；每年按期提供健康檢查報告者，次一保單年度起年繳約 ${fmtD(rate*wan*(1-HEALTH_DISCOUNT-(state.payDisc?PAY_DISCOUNT:0)))} 元（1% 健康管理折扣${state.payDisc?'＋1% 轉帳折扣':''}；僅供概算）。</dd>`;
+  }
+  document.getElementById('spillBox').innerHTML=`
+    <dt>外溢機制：健康管理保險費折扣</dt>
+    <dd>本契約有效之繳費期間內，被保險人於「指定期間」內，接受合格醫療機構或醫事檢驗所之合格醫事人員所作健康檢查，並將包含<strong>身高、體重、血壓、血糖、血脂肪（膽固醇及三酸甘油脂）</strong>等數值之健康檢查報告送達富邦人壽者，提供<strong>次一保單年度續期保險費（不含附約）${HEALTH_DISCOUNT*100}%</strong> 之折扣（條款第七條）。</dd>
+    <dt>指定期間</dt>
+    <dd>第1保單年度：自生效日當日起，算至最近的保單週年日前二個週月日之前一日止；第2保單年度起：上一保單年度指定期間屆滿日翌日起，算至隔一年與第1保單年度指定期間屆滿日相當之日止。</dd>
+    <dt>其他規定</dt>
+    <dd>同一指定期間內，無論健檢幾次，折扣均以一次計；未於期限內提供報告者，次一保單年度不提供折扣。折扣上限為主約應收保費之 1%。</dd>
+    <dt>繳費方式折扣</dt>
+    <dd>首期匯款、首／續期轉帳或富邦信用卡、續期自行繳費：總應收保費之 ${PAY_DISCOUNT*100}%（上限為主約應收保費 1%）。左側可勾選「已含轉帳 1% 折扣」。</dd>
+    ${ex}`;
+}
+
+function renderRules(){
+  const m=META[state.prod];
+  document.getElementById('rulesBox').innerHTML=`
+    <dt>商品全名</dt><dd>${m.full}</dd>
+    <dt>商品文號</dt><dd>${m.docNo}（依 DM／條款所載）</dd>
+    <dt>投保年齡／繳費年期</dt><dd>10年期 ${AGE_MIN}～${AGE_MAX_BY_TERM[10]} 歲；20年期 ${AGE_MIN}～${AGE_MAX_BY_TERM[20]} 歲（足歲）。無 30年期。</dd>
+    <dt>保險年期</dt><dd>定期，保障至保險年齡屆滿 ${BENEFIT.maturityAge} 歲（非終身，無祝壽金）。</dd>
+    <dt>繳別</dt><dd>年繳、半年繳、季繳、月繳（半年繳×${MODAL.semi}、季繳×${MODAL.qtr}、月繳×${MODAL.mon}）。</dd>
+    <dt>保額</dt><dd>以萬元為單位；最低 ${AMT_MIN} 萬、累計本險種最高 ${AMT_MAX} 萬（累計總限額以現行投保規則為準）。</dd>
+    <dt>等待期間</dt><dd>癌症 90 日（自生效日起持續有效）；疾病：生效日起持續有效 30 日以後所發生者。</dd>
+    <dt>解約金</dt><dd>無解約金（費率已考慮脫退率）。</dd>
+    <dt>身故／滿期</dt><dd>身故：當年度保險金額（年繳保險費總和×${BENEFIT.maturityFactor} − 已領保險金累計）。滿期：保險年齡屆滿 ${BENEFIT.maturityAge} 歲仍生存，同上公式。</dd>
+    <dt>性別</dt><dd>${state.prod==='CLZ'?'限男性':'限女性'}</dd>
+    <dt>投保管道</dt><dd>官網標示：本商品無開放網路投保；客服專線 0809-000-550。</dd>
+    <dt>銷售期間</dt><dd><span class="tbd">待補</span>（DM／條款未載明銷售起迄日；請以公司公告為準）</dd>`;
+}
+
+function renderDisclaimer(){
+  const m=META[state.prod];
+  document.getElementById('disclaimer').innerHTML=
+    `本試算僅供業務參考，以富邦人壽正式保單條款、DM、商品內容說明與費率表為準。<br>
+    ${state.prod}：${m.docNo}。本保險為不分紅保單，無解約金。等待期間：癌症 90 日。保險年齡屆滿 ${BENEFIT.maturityAge} 歲仍生存給付滿期保險金（無祝壽保險金）。<br>
+    繳別係數：半年繳 ×${MODAL.semi}、季繳 ×${MODAL.qtr}、月繳 ×${MODAL.mon}。`;
+}
+
+function refreshUnitSide(){
+  updateTermButtons();
+  renderUnitTable();
+  renderRules();
+  renderDisclaimer();
+}
+function refreshAmountSide(){
+  updateAmtButtons();
+  renderOverlays();
+  renderPremium();
+  renderBenefits();
+  renderSpill();
+  renderClientBanner();
+}
+
+function specificBundle(){
+  return SPECIFIC_CANCERS[state.prod] || SPECIFIC_CANCERS.CLZ;
+}
+function moneyOfPct(pct){
+  const wan=state.amount||100;
+  return Math.round(wan*10000 * (pct/100));
+}
+function fmtWan(yuan){
+  if(yuan==null||isNaN(yuan)) return '—';
+  const wan=yuan/10000;
+  const r=Math.round(wan*10)/10;
+  return (Number.isInteger(r) ? String(r) : r.toFixed(1)) + '萬';
+}
+function renderCancerDetail(item){
+  const box=document.getElementById('cancerDetail');
+  const b=specificBundle();
+  if(!item){
+    box.innerHTML='<div class="detail-prompt">請選擇一種癌症</div>';
+    return;
+  }
+  const cells=SPECIFIC_BONUS.map(s=>{
+    const totalPct=BENEFIT.severePct+s.pct;
+    const short=s.year.includes('6')?'第6年起':s.year.replace('保單年度','');
+    return '<div class="detail-year"><span class="dy">'+short+'</span><span class="dp">'+totalPct+
+      '%</span><span class="da">'+fmtWan(moneyOfPct(totalPct))+'</span></div>';
+  }).join('');
+  const cause=item.cause ? '<p class="detail-cause">常見原因：'+item.cause+'</p>' : '';
+  const intro=item.intro ? '<p class="detail-intro">'+item.intro+'</p>' : '';
+  const cost=item.cost ? '<p class="detail-cost">約略費用：'+item.cost+'</p>' : '';
+  const srcBits=[item.causeSrc, item.costSrc].filter(Boolean);
+  const src=srcBits.length ? '<p class="detail-cost-src">'+srcBits.join('；')+'</p>' : '';
+  const maxB=SPECIFIC_BONUS[SPECIFIC_BONUS.length-1].pct, minB=SPECIFIC_BONUS[0].pct;
+  box.innerHTML=
+    '<div class="detail-name">'+item.short+'</div>'+
+    '<p class="detail-icd2">條款附表一：ICD-10-CM '+item.id.toUpperCase()+'｜'+(item.official||'')+'</p>'+
+    cause+
+    intro+
+    cost+
+    src+
+    '<p class="detail-one">保額 '+state.amount+'萬 · 重度'+BENEFIT.severePct+'%＋加成'+minB+'%～'+maxB+'%（第2保單年度起）</p>'+
+    '<div class="detail-years">'+cells+'</div>'+
+    '<p class="detail-src">'+b.source+'</p>';
+}
+function highlightBodyCard(calloutId){
+  document.querySelectorAll('.body-card').forEach(function(el){
+    el.classList.toggle('on', !!calloutId && el.dataset.id===calloutId);
+  });
+}
+function renderBodyCards(b, useGpt){
+  const box=document.getElementById('bodyCards');
+  if(!box) return;
+  if(!useGpt || !b.callouts || !b.callouts.length){
+    box.innerHTML='';
+    box.onclick=null;
+    return;
+  }
+  box.innerHTML=b.callouts.map(function(c){
+    const bx=c.box||{};
+    const first=(c.items&&c.items[0])||'';
+    return '<button type="button" class="body-card" data-id="'+c.id+'" data-first="'+first+
+      '" aria-label="'+(c.organ||c.id)+'" style="left:'+bx.left+'%;top:'+bx.top+
+      '%;width:'+bx.width+'%;height:'+bx.height+'%"></button>';
+  }).join('');
+  box.onclick=function(e){
+    const hit=e.target.closest('.body-card');
+    if(!hit) return;
+    const first=hit.dataset.first;
+    if(first) selectCancer(first);
+  };
+}
+function selectCancer(id){
+  selectedCancerId=id;
+  const b=specificBundle();
+  const item=b.items.find(x=>x.id===id)||null;
+  document.querySelectorAll('.chip').forEach(ch=>ch.classList.toggle('active', ch.dataset.id===id));
+  renderCancerDetail(item);
+  highlightBodyCard(item ? item.callout : null);
+}
+function setBodyImage(b){
+  const img=document.getElementById('bodyImg');
+  const fig=document.getElementById('bodyFig');
+  if(!img||!fig) return;
+  const gpt=b.gptBody;
+  const fallback=b.body;
+  const probe=new Image();
+  probe.onload=function(){
+    img.src=gpt;
+    img.alt=b.product+'特定癌症圖';
+    fig.classList.add('with-gpt');
+    renderBodyCards(b, true);
+    const cur=b.items.find(x=>x.id===selectedCancerId);
+    highlightBodyCard(cur ? cur.callout : null);
+  };
+  probe.onerror=function(){
+    img.src=fallback;
+    img.alt=b.product+'特定癌症圖';
+    fig.classList.remove('with-gpt');
+    renderBodyCards(b, false);
+  };
+  probe.src=gpt;
+}
+function renderCancerPanel(){
+  const b=specificBundle();
+  document.body.classList.toggle('theme-clz', state.prod==='CLZ');
+  document.body.classList.toggle('theme-clx', state.prod==='CLX');
+  document.getElementById('cancerTitle').textContent=b.title;
+  const note=document.getElementById('cancerNote');
+  const lo=SPECIFIC_BONUS[0].pct, hi=SPECIFIC_BONUS[SPECIFIC_BONUS.length-1].pct;
+  if(note) note.textContent='特定癌症（重度）自第2保單年度起另給加成'+lo+'%～'+hi+'%；其餘：初期／輕度'+BENEFIT.earlyMildPct+'%、重度'+BENEFIT.severePct+'%（第1保單年度為年繳保險費總和×'+BENEFIT.maturityFactor+'）。';
+  setBodyImage(b);
+  const chips=document.getElementById('cancerChips');
+  chips.innerHTML=b.items.map(it=>
+    '<button type="button" class="chip" role="option" data-id="'+it.id+'">'+it.short+'</button>'
+  ).join('');
+  chips.onclick=function(e){
+    const btn=e.target.closest('.chip'); if(!btn) return;
+    selectCancer(btn.dataset.id);
+  };
+  if(selectedCancerId && b.items.some(function(it){return it.id===selectedCancerId;})){
+    selectCancer(selectedCancerId);
+  } else {
+    selectedCancerId=null;
+    renderCancerDetail(null);
+  }
+}
+
+function refreshAll(){
+  refreshUnitSide();
+  refreshAmountSide();
+  renderCancerPanel();
+}
+
+function setAgeLine(html, isErr){
+  const el=document.getElementById('ageLine');
+  el.innerHTML = isErr ? `<span class="err">${html}</span>` : html;
+}
+
+function applyBirthLive(){
+  const p=parseBirth(document.getElementById('birthInput').value);
+  if(!p.ok){
+    if(!document.getElementById('birthInput').value.trim()){
+      setAgeLine('請輸入生日'); state.age=null;
+    } else {
+      setAgeLine(p.err, true); state.age=null;
+    }
+    refreshAll(); return;
+  }
+  state.age=p.info.ins;
+  setAgeLine(`足歲 ${p.info.actual} 歲・保險年齡 <strong>${p.info.ins} 歲</strong>`);
+  refreshAll();
+}
+function applyAgeLive(){
+  const raw=document.getElementById('ageInput').value.trim();
+  if(raw===''){ setAgeLine('請輸入歲數'); state.age=null; refreshAll(); return; }
+  const age=+raw;
+  const rangeMsg=`保險年齡須為 ${AGE_MIN}～${AGE_MAX_ANY}`;
+  if(!/^\d{1,3}$/.test(raw) || age<AGE_MIN || age>AGE_MAX_ANY){
+    setAgeLine(rangeMsg, true); state.age=null; refreshAll(); return;
+  }
+  state.age=age|0;
+  setAgeLine(`保險年齡 <strong>${state.age} 歲</strong>（直接輸入）`);
+  refreshAll();
+}
+
+function setMode(mode){
+  state.mode=mode;
+  document.querySelectorAll('#ageModeSeg button').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  document.getElementById('birthPanel').classList.toggle('hidden', mode!=='birth');
+  document.getElementById('agePanel').classList.toggle('hidden', mode!=='age');
+  if(mode==='birth') applyBirthLive(); else applyAgeLive();
+}
+
+document.getElementById('prodSeg').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-prod]'); if(!b) return;
+  state.prod=b.dataset.prod; setTheme(); refreshAll();
+});
+document.getElementById('ageModeSeg').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-mode]'); if(!b) return;
+  setMode(b.dataset.mode);
+});
+document.getElementById('termSeg').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-term]'); if(!b||b.disabled) return;
+  state.term=+b.dataset.term; refreshAll();
+});
+document.getElementById('birthInput').addEventListener('input', applyBirthLive);
+document.getElementById('ageInput').addEventListener('input', applyAgeLive);
+document.getElementById('payDisc').addEventListener('change', e=>{
+  state.payDisc=!!e.target.checked; refreshAll();
+});
+document.getElementById('amtGrid').addEventListener('click', e=>{
+  const b=e.target.closest('button[data-amt]'); if(!b) return;
+  state.amount=+b.dataset.amt;
+  refreshAmountSide();
+  renderUnitTable();
+});
+document.getElementById('amtCustom').addEventListener('input', e=>{
+  const v=+e.target.value;
+  if(!v || v<AMT_MIN || v>AMT_MAX) return;
+  state.amount=v|0;
+  refreshAmountSide();
+});
+document.getElementById('amtCustom').addEventListener('change', e=>{
+  let v=+e.target.value; if(!v) return;
+  v=Math.max(AMT_MIN, Math.min(AMT_MAX, v|0));
+  state.amount=v; e.target.value=v; refreshAmountSide();
+});
+
+async function downloadExport(){
+  const btn=document.getElementById('btnDownload');
+  const hint=document.getElementById('dlHint');
+  if(typeof html2canvas!=='function'){ hint.textContent='下載元件載入中…'; return; }
+  btn.disabled=true; hint.textContent='產生圖片中…';
+  const mount=document.getElementById('exportMount');
+  try{
+    const stage=document.getElementById('chartStage').cloneNode(true);
+    const unit=document.getElementById('unitSection').cloneNode(true);
+    stage.removeAttribute('id');
+    unit.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+    mount.innerHTML='';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='width:1024px;padding:20px;background:#fff;font-family:PingFang TC,Microsoft JhengHei,sans-serif';
+    const title=document.createElement('div');
+    title.style.cssText='font-size:20px;font-weight:900;margin-bottom:6px;color:#0f2a4a;line-height:1.35';
+    const name=clientNameTrim();
+    const rate=rateOf(state.age, state.term);
+    const prem = rate==null ? '—' : (fmtD(annualPremium(rate,state.amount))+' 元');
+    const bits=[`${META[state.prod].pill}`, `${state.age??'—'}歲`, `${state.term}年期`, `保額${state.amount}萬`, `年繳${prem}`];
+    if(name){
+      const t1=document.createElement('div');
+      const isFem=state.prod==='CLX';
+      t1.style.cssText='font-size:20px;font-weight:900;margin-bottom:8px;padding:0 18px;min-height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1;letter-spacing:.02em;color:'+(isFem?'#880e4f':'#0d47a1')+';background:'+(isFem?'linear-gradient(135deg,#fce4ec 0%,#f8bbd0 55%,#f48fb1 100%)':'linear-gradient(135deg,#e3f2fd 0%,#bbdefb 55%,#90caf9 100%)')+';box-shadow:'+(isFem?'0 4px 14px rgba(194,24,91,.18)':'0 4px 14px rgba(21,101,192,.18)');
+      t1.textContent=`${name} ${clientHonorific()} 專屬試算`;
+      const t2=document.createElement('div');
+      t2.style.cssText='font-size:17px;font-weight:800;color:#334b57';
+      t2.textContent=bits.join('｜');
+      title.appendChild(t1); title.appendChild(t2);
+    } else {
+      title.textContent = bits.join('｜');
+    }
+    wrap.appendChild(title);
+    stage.style.width='984px';
+    wrap.appendChild(stage);
+    const sp=document.createElement('div'); sp.style.height='16px'; wrap.appendChild(sp);
+    wrap.appendChild(unit);
+    mount.appendChild(wrap);
+    const img=stage.querySelector('img.base');
+    if(img && !img.complete) await new Promise(r=>{ img.onload=r; img.onerror=r; });
+    await new Promise(r=>setTimeout(r,80));
+    fitAllOverlays(stage);
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const canvas=await html2canvas(wrap,{
+      backgroundColor:'#ffffff', scale:2, useCORS:true, logging:false,
+      width:1024, windowWidth:1024
+    });
+    const a=document.createElement('a');
+    const nm=clientNameTrim(); a.download=`${nm?nm+'_':''}${state.prod}_${state.age??'x'}歲${META[state.prod].sex}_${state.term}年期_${state.amount}萬.png`;
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    hint.textContent='已下載 PNG（保障圖＋單位試算表）。';
+    window.__lastExportCanvas=canvas;
+  }catch(err){
+    hint.textContent='下載失敗：'+(err&&err.message?err.message:err);
+  }finally{
+    btn.disabled=false; mount.innerHTML='';
+  }
+}
+document.getElementById('clientName').addEventListener('input', e=>{
+  state.clientName=e.target.value;
+  renderClientBanner();
+});
+document.getElementById('btnDownload').addEventListener('click', downloadExport);
+
+window.addEventListener('resize', ()=>{ scheduleFitOverlays(); });
+
+const chartBaseEl=document.getElementById('chartBase');
+chartBaseEl.addEventListener('load', scheduleFitOverlays);
+if(chartBaseEl.complete) scheduleFitOverlays();
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(scheduleFitOverlays).catch(()=>{});
+}
+
+// default demo: age mode 49
+document.getElementById('ageInput').value='49';
+setMode('age');
+setTheme();
+refreshAll();
+setTimeout(scheduleFitOverlays, 0);
+
+window.state=state;
+window.RATES=RATES;
+window.calcInsuranceAge=calcInsuranceAge;
+window.parseBirth=parseBirth;
+
+</script>
+</body>
+</html>
