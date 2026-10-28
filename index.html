@@ -305,6 +305,7 @@ body.theme-clz{--cancer-accent:#1565c0}
 .detail-cause{font-size:12.5px; font-weight:800; color:#455a64; line-height:1.4; margin:2px 0 6px}
 .detail-intro{font-size:13px; font-weight:700; color:var(--ink); line-height:1.4; margin:0 0 6px}
 .detail-cost{font-size:12.5px; font-weight:800; color:var(--cancer-accent,#1565c0); margin:0 0 2px; line-height:1.35}
+.detail-note{font-size:11px; font-weight:700; color:#8a5a00; line-height:1.35; margin:0 0 8px}
 .detail-cost-src{font-size:10px; color:#9aa6ad; margin:0 0 8px; line-height:1.3}
 .detail-icd{display:none}
 
@@ -617,39 +618,39 @@ const SPECIFIC_CANCERS = {
       {id:'c18', short:'結腸癌', callout:'colo',
         cause:'飲食低纖、紅肉加工肉、肥胖、家族史', causeSrc:'國健署',
         intro:'大腸常見惡性腫瘤，早期常無明顯症狀。',
-        cost:'自費標靶約 每月10～30萬', costSrc:'公開藥價整理（癌思停／爾必得舒等）'},
+        cost:'轉移性可用標靶（癌思停、爾必得舒等）符合條件可健保給付；不符條件自費約每月6～20萬', costSrc:'健保署給付規定9.27／衛福部（115/2/1）；台灣癌症基金會；藥師家（二手整理）'},
       {id:'c19', short:'直腸乙狀結腸癌', callout:'rect',
         cause:'飲食低纖、紅肉加工肉、肥胖、家族史', causeSrc:'國健署',
         intro:'直腸與乙狀結腸交接處的惡性腫瘤。',
-        cost:'自費標靶約 每月10～30萬', costSrc:'公開藥價整理（癌思停／爾必得舒等）'},
+        cost:'轉移性可用標靶（癌思停、爾必得舒等）符合條件可健保給付；不符條件自費約每月6～20萬', costSrc:'健保署給付規定9.27／衛福部（115/2/1）；台灣癌症基金會；藥師家（二手整理）'},
       {id:'c20', short:'直腸癌', callout:'rect',
         cause:'飲食低纖、紅肉加工肉、肥胖、缺乏運動', causeSrc:'國健署',
         intro:'靠近肛門的大腸惡性腫瘤，可影響排便。',
-        cost:'自費標靶約 每月10～30萬', costSrc:'公開藥價整理（癌思停／爾必得舒等）'},
+        cost:'轉移性可用標靶（癌思停、爾必得舒等）符合條件可健保給付；不符條件自費約每月6～20萬', costSrc:'健保署給付規定9.27／衛福部（115/2/1）；台灣癌症基金會；藥師家（二手整理）'},
       {id:'c21', short:'肛門癌', callout:'rect',
         cause:'HPV感染、吸菸、免疫抑制', causeSrc:'ACS／醫院HPV衛教',
         intro:'肛門及肛管的惡性腫瘤，相對少見。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'早中期以放化療為主；晚期若考慮免疫藥，目前健保多未給付，自費約每次5～15萬', costSrc:'NCI PDQ；亞東醫院（免疫每次約5～15萬）；健保署給付規定9.69'},
       {id:'c60', short:'陰莖癌', callout:'penile',
         cause:'HPV、包皮衛生不良、吸菸', causeSrc:'台灣男性學暨性醫學醫學會',
         intro:'陰莖皮膚或黏膜的惡性腫瘤，相對少見。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'晚期若用免疫藥，目前健保多未給付此癌別，自費約每次5～15萬；實際依醫師評估', costSrc:'亞東醫院（免疫每次約5～15萬）；健保署給付規定9.69'},
       {id:'c61', short:'攝護腺癌', callout:'prostate',
-        cause:'年齡、家族史、高脂飲食', causeSrc:'衛福部／慈濟醫院衛教',
+        cause:'年齡（55歲後明顯上升）、家族史（父親或兄弟罹患）、種族與遺傳；飲食與環境影響尚無定論', causeSrc:'衛福部國健署；台北慈濟醫院',
         intro:'男性常見癌症，早期常無明顯症狀。',
-        cost:'新一代口服荷爾蒙自費約 每月10萬', costSrc:'臺大泌尿部／楓城泌尿學會衛教'},
+        cost:'新一代口服荷爾蒙符合條件可健保給付；不符條件自費約每月4～5萬', costSrc:'健保署給付規定／衛福部；醫師依健保價估算（2026-10，二手）'},
       {id:'c62', short:'睪丸癌', callout:'testis',
-        cause:'隱睪、家族史、年輕男性', causeSrc:'NCI／睪丸癌基金會',
+        cause:'隱睪、本人或家人曾罹睪丸癌、睪丸發育異常；多見於15～40歲年輕男性', causeSrc:'NCI；台灣癌症臨床研究發展基金會',
         intro:'好發於年輕男性的睪丸惡性腫瘤。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'以手術為主，視情況加化療，整體治癒率高（逾9成）；標靶／免疫非主要治療，費用依療程而異', costSrc:'台灣癌症臨床研究發展基金會（三軍總醫院）；睪丸癌基金會'},
       {id:'c63', short:'其他男性生殖器癌', callout:'penile',
-        cause:'HPV、衛生不良、慢性發炎', causeSrc:'台灣泌尿科醫學會指引',
+        cause:'依實際發生部位而異，請以醫師診斷為準', causeSrc:'',
         intro:'其他及未明示男性生殖器官惡性腫瘤。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'依實際部位與治療方式而異，請向醫院確認', costSrc:''},
       {id:'c67', short:'膀胱癌', callout:'bladder',
         cause:'吸菸、化學染劑暴露、慢性發炎', causeSrc:'大林慈濟醫院衛教',
         intro:'泌尿系統常見惡性腫瘤，血尿為重要警訊。',
-        cost:'自費免疫約 每次5～15萬', costSrc:'亞東醫院腫瘤科說明'}
+        cost:'晚期免疫藥符合條件可健保給付；不符條件自費約每次5～15萬', costSrc:'健保署給付規定9.69；亞東醫院（免疫每次約5～15萬）'}
     ],
     callouts: [{"id": "colo", "organ": "結腸癌", "box": {"left": 1.758, "top": 24.792, "width": 24.609, "height": 7.847}, "items": ["c18"]}, {"id": "bladder", "organ": "膀胱癌", "box": {"left": 1.758, "top": 44.444, "width": 24.609, "height": 7.917}, "items": ["c67"]}, {"id": "testis", "organ": "睪丸癌", "box": {"left": 1.758, "top": 60.208, "width": 24.609, "height": 7.986}, "items": ["c62"]}, {"id": "rect", "organ": "直腸乙狀結腸癌", "box": {"left": 73.535, "top": 31.944, "width": 24.512, "height": 7.847}, "items": ["c19", "c20", "c21"]}, {"id": "prostate", "organ": "攝護腺癌", "box": {"left": 73.535, "top": 46.528, "width": 24.414, "height": 7.917}, "items": ["c61"]}, {"id": "penile", "organ": "陰莖癌・其他", "box": {"left": 73.535, "top": 60.278, "width": 24.512, "height": 7.917}, "items": ["c60", "c63"]}]
   },
@@ -660,49 +661,49 @@ const SPECIFIC_CANCERS = {
     source: 'CLX條款 附表一（特定癌症（重度））／第十五條',
     items: [
       {id:'c43', short:'惡性黑色素瘤', callout:'skin',
-        cause:'紫外線、曬傷、多痣、家族史', causeSrc:'Skin Cancer Foundation／WHO',
+        cause:'紫外線曝曬與曬傷、痣多或不典型痣、家族史；亞洲人較常見肢端型（手腳掌、指甲下），與紫外線關係較小', causeSrc:'馬偕醫院皮膚科衛教；衛福部（國衛院）',
         intro:'惡性度較高的皮膚色素細胞癌。',
-        cost:'自費免疫約 每月18～25萬', costSrc:'公開整理（免疫檢查點抑制劑月費）'},
+        cost:'晚期免疫藥（吉舒達、保疾伏）健保僅給付先前全身治療失敗者；不符條件自費約每月12～20萬', costSrc:'健保署給付規定9.69；《康健》癌症問康健（2023）'},
       {id:'c44', short:'其他皮膚惡性腫瘤', callout:'skin',
         cause:'長期日曬、紫外線暴露', causeSrc:'WHO紫外線說明',
         intro:'皮膚其他及未明示之惡性腫瘤。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'多以手術切除為主，費用依範圍而異；少數晚期才需評估用藥', costSrc:'馬偕醫院皮膚科衛教；台灣癌症基金會'},
       {id:'c50', short:'乳癌', callout:'breast',
         cause:'家族史、停經後肥胖、未生育', causeSrc:'衛福部／林口長庚',
         intro:'台灣女性發生率最高的癌症。',
-        cost:'自費標靶／新藥約 每月10～20萬', costSrc:'中央社／病友案例（轉移新藥月費約20萬）'},
+        cost:'晚期部分標靶／新藥已納健保（如 T-DXd、CDK4/6 抑制劑，須符合條件）；不符條件者自費，依藥物差異大（曾有病友自費約每月20萬）', costSrc:'中央社 2025-02-10；衛福部／健保署給付規定'},
       {id:'c51', short:'外陰癌', callout:'pelvic',
-        cause:'HPV感染、吸菸、慢性刺激', causeSrc:'醫院HPV六癌衛教',
+        cause:'高危型HPV持續感染、吸菸、外陰慢性病變（如硬化性苔蘚）、免疫低下', causeSrc:'NCI／ACS 外陰癌危險因子',
         intro:'外陰部位的惡性腫瘤，相對少見。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'晚期若用免疫藥，目前健保多未給付此癌別，自費約每次5～15萬；實際依醫師評估', costSrc:'亞東醫院（免疫每次約5～15萬）；健保署給付規定9.69'},
       {id:'c52', short:'陰道癌', callout:'pelvic',
-        cause:'HPV感染、子宮頸癌病史', causeSrc:'醫院HPV六癌衛教',
+        cause:'高危型HPV持續感染、曾有子宮頸癌或癌前病變、吸菸、免疫低下', causeSrc:'NCI／ACS 陰道癌危險因子',
         intro:'陰道黏膜的惡性腫瘤，相對少見。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'晚期若用免疫藥，目前健保多未給付此癌別，自費約每次5～15萬；實際依醫師評估', costSrc:'亞東醫院（免疫每次約5～15萬）；健保署給付規定9.69'},
       {id:'c53', short:'子宮頸癌', callout:'cervix',
         cause:'HPV持續感染、過早性行為、吸菸', causeSrc:'衛福部／國健署',
         intro:'可透過抹片與疫苗預防的婦癌。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'晚期若用免疫藥（如吉舒達），目前健保未給付此癌別，自費約每月12～15萬', costSrc:'健保署給付規定9.69；《康健》癌症問康健（2023）'},
       {id:'c54', short:'子宮體癌', callout:'uterus',
         cause:'肥胖、糖尿病、雌激素暴露', causeSrc:'國健署',
         intro:'多為子宮內膜癌，常見於停經前後。',
-        cost:'部分化療／標靶須自費，一年可逾百萬', costSrc:'TVBS／癌症希望基金會病友調查'},
+        cost:'部分化療／晚期新藥曾須自費，有病友報導一年逾百萬；2026年8月起特定類型（dMMR/MSI-H）免疫＋化療已納健保（暫時性支付），仍須符合條件', costSrc:'中央社 2026-09-16；TVBS 2025-09-04（個案）'},
       {id:'c55', short:'子宮惡性腫瘤', callout:'uterus',
         cause:'肥胖、月經異常、婦癌家族史', causeSrc:'國健署',
         intro:'未明示部位的子宮惡性腫瘤。',
-        cost:'部分化療／標靶須自費，一年可逾百萬', costSrc:'TVBS／癌症希望基金會病友調查'},
+        cost:'部分化療／晚期新藥曾須自費，有病友報導一年逾百萬；2026年8月起特定類型（dMMR/MSI-H）免疫＋化療已納健保（暫時性支付），仍須符合條件', costSrc:'中央社 2026-09-16；TVBS 2025-09-04（個案）'},
       {id:'c56', short:'卵巢癌', callout:'ovary',
         cause:'家族史、未生育、肥胖', causeSrc:'郭綜合醫院／林口長庚',
         intro:'早期症狀不明顯，常較晚才發現。',
-        cost:'PARP抑制劑自費約 每月十餘萬', costSrc:'《康健》癌症專題／鄭文芳醫師'},
+        cost:'PARP抑制劑符合條件（晚期、第一線化療有效、BRCA突變或HRD陽性）可健保給付；不符條件自費約每月十餘萬', costSrc:'衛福部／健保署（114/6/1）；《康健》癌症問康健（2024）'},
       {id:'c57', short:'其他女性生殖器癌', callout:'pelvic',
-        cause:'HPV感染、慢性發炎', causeSrc:'醫院HPV相關衛教',
+        cause:'依實際發生部位而異，請以醫師診斷為準', causeSrc:'',
         intro:'其他及未明示女性生殖器官惡性腫瘤。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'},
+        cost:'依實際部位與治療方式而異，請向醫院確認', costSrc:''},
       {id:'c58', short:'胎盤癌', callout:'pelvic',
-        cause:'葡萄胎病史、高齡懷孕', causeSrc:'ACS妊娠滋養細胞腫瘤',
+        cause:'曾有葡萄胎（最主要）；懷孕年齡過輕（<20歲）或偏高（>35歲）；亦可發生於流產、子宮外孕或正常生產後', causeSrc:'NCI 妊娠滋養細胞疾病（PDQ）；Cancer Research UK',
         intro:'與妊娠相關的罕見惡性腫瘤。',
-        cost:'自費標靶／免疫約 每月10～30萬', costSrc:'亞東醫院：免疫每次約5～15萬'}
+        cost:'多數對化療反應良好，以化療為主，治癒率高；一般非自費標靶／免疫，費用依療程而異', costSrc:'NCI 妊娠滋養細胞疾病（PDQ）'}
     ],
     callouts: [{"id": "breast", "organ": "乳癌", "box": {"left": 3.711, "top": 2.045, "width": 26.953, "height": 11.468}, "items": ["c50"]}, {"id": "ovary", "organ": "卵巢癌", "box": {"left": 3.516, "top": 42.221, "width": 25.586, "height": 9.642}, "items": ["c56"]}, {"id": "pelvic", "organ": "外陰・陰道・胎盤癌", "box": {"left": 3.32, "top": 62.6, "width": 27.246, "height": 11.103}, "items": ["c51", "c52", "c57", "c58"]}, {"id": "skin", "organ": "皮膚癌", "box": {"left": 69.531, "top": 11.322, "width": 27.051, "height": 11.468}, "items": ["c43", "c44"]}, {"id": "uterus", "organ": "子宮體癌", "box": {"left": 71.191, "top": 38.13, "width": 25.488, "height": 10.153}, "items": ["c54", "c55"]}, {"id": "cervix", "organ": "子宮頸癌", "box": {"left": 69.434, "top": 57.341, "width": 27.246, "height": 11.03}, "items": ["c53"]}]
   }
@@ -1114,6 +1115,7 @@ function renderCancerDetail(item){
     intro+
     cost+
     src+
+    '<p class="detail-note">費用為約略值，健保給付依條件而異，實際以醫師與醫院說明為準</p>'+
     '<p class="detail-one">保額 '+state.amount+'萬 · 重度'+BENEFIT.severePct+'%＋加成'+minB+'%～'+maxB+'%（第2保單年度起）</p>'+
     '<div class="detail-years">'+cells+'</div>'+
     '<p class="detail-src">'+b.source+'</p>';
